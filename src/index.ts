@@ -3,12 +3,18 @@ import { createConnection, getConnectionOptions } from "typeorm";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
+import cors from "cors";
 import { CardResolver } from "./resolvers/CardResolver";
 import { CheckInResolver } from "./resolvers/CheckInResolver";
 import { ScheduleTodayNight, ScheduleTodayMorning }  from "./schedules";
 
 (async () => {
   const app = express();
+  
+  app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+  }));
 
   const options = await getConnectionOptions(
     process.env.NODE_ENV || "development"
