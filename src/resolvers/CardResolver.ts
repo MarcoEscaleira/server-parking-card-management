@@ -2,7 +2,6 @@ import { Resolver, Mutation, Arg, Int, Query, InputType, Field } from "type-grap
 import { Card } from "../entity/Card";
 import { CheckIn } from "../entity/CheckIn";
 
-
 @InputType()
 class CardInputUpdate {
   @Field(() => Int)
@@ -91,24 +90,46 @@ export class CardResolver {
   }
 
   @Query(() => Number)
-  async cardsAvailable(
+  async cardsAvailableNumber(
     @Arg("date", () => String) date: string
   ) {
-    const cards = await Card.find();
-    const dateCheckins = await CheckIn.find({
-      startDate: date
+    const cards = await Card.find({
+      isDisabled: false
     });
-
+    const checkIns = await CheckIn.find();
+    const dateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date));
     let counter = cards.length;
-
-    dateCheckins.forEach((checkin) => {
+    
+    dateCheckIns.forEach((checkin) => {
       cards.forEach(card => {
         if (checkin.cardId === card.cardId) {
           counter--;
         }
       })
     });
-
     return counter;
+  }
+  
+  @Query(() => [Card])
+  async cardsAvailableList(
+    @Arg("date", () => String) date: string
+  ) {
+    const allCards = await Card.find({
+      isDisabled: false
+    });
+    const checkIns = await CheckIn.find();
+    const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date.split('T')[0]));
+    const mainCheckInHour = date.split('T')[1].split('Z')[0];
+    let notAvailableCardsId: number[] = [];
+    
+    allDateCheckIns.forEach(checkIn => {
+      const checkInFinishHour = checkIn.endDate.split('T')[1].split('Z')[0];
+      if (checkInFinishHour > mainCheckInHour) {
+          if (notAvailableCardsId.indexOf(checkIn.cardId) === -1) {
+            notAvailableCardsId.push(checkIn.cardId);
+          }
+      }
+    });
+    return allCards.filter((card => notAvailableCardsId.indexOf(card.cardId) === -1));
   }
 }
