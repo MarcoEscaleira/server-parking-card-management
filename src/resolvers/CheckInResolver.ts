@@ -13,8 +13,7 @@ export class CheckInResolver {
     @Arg("userEmail", () => String) userEmail: string,
     @Arg("startDate", () => String) startDate: string,
     @Arg("endDate", () => String) endDate: string,
-    @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean,
-    @Arg("isReserved", () => Boolean) isReserved: boolean
+    @Arg("isReserved", () => Boolean) isReserved: boolean = false
   ) {
     try {
       await CheckIn.insert({
@@ -22,7 +21,6 @@ export class CheckInResolver {
         userEmail,
         startDate,
         endDate,
-        hasCheckedOut,
         isReserved
       });
 
@@ -32,6 +30,26 @@ export class CheckInResolver {
     }
     return false;
   }
+
+  /*
+  *  UPDATE
+  */
+ @Mutation(() => Boolean)
+ async updateCheckIn(
+   @Arg("checkInId", () => Int) checkInId: number,
+   @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean
+ ) {
+   try {
+     await CheckIn.update({ checkInId },{
+      hasCheckedOut
+     });
+
+     return true
+   } catch(error) {
+     console.error("UPDATE CHECKIN:", error);
+   }
+   return false;
+ }
 
   /*
   *  DELETE

@@ -5,6 +5,7 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { CardResolver } from "./resolvers/CardResolver";
 import { CheckInResolver } from "./resolvers/CheckInResolver";
+import { ScheduleTodayNight, ScheduleTodayMorning }  from "./schedules";
 
 (async () => {
   const app = express();
@@ -24,7 +25,11 @@ import { CheckInResolver } from "./resolvers/CheckInResolver";
 
   apolloServer.applyMiddleware({ app, cors: false });
   const port = process.env.PORT || 4000;
+
   app.listen(port, () => {
     console.log(`server started at http://localhost:${port}/graphql`);
   });
+  
+  ScheduleTodayNight(); // Schedule that checks if user has check ins open and alerts about checking out
+  ScheduleTodayMorning(); // Schedule that checks if user has check ins open and complete user checkout
 })();

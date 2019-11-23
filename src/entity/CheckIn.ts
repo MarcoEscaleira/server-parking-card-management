@@ -27,6 +27,10 @@ export class CheckIn extends BaseEntity {
   @Field()
   @Column('boolean', { default: false })
   hasCheckedOut: boolean;
+  
+  @Field()
+  @Column('boolean', { default: false })
+  hasExpired: boolean;
 
   @Field()
   @Column('boolean', { default: false })
