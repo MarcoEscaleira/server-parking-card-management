@@ -1,5 +1,6 @@
 import { Resolver, Mutation, Arg, Int, Query, InputType, Field } from "type-graphql";
 import { Card } from "../entity/Card";
+import { CheckIn } from "../entity/CheckIn";
 
 
 @InputType()
@@ -20,6 +21,10 @@ class CardInputUpdate {
 
 @Resolver()
 export class CardResolver {
+
+  /*
+  *  CREATE
+  */
   @Mutation(() => Number)
   async createCard(
     @Arg("cardNumber", () => Number) cardNumber: number
@@ -36,6 +41,9 @@ export class CardResolver {
     return -1;
   }
 
+  /*
+  *  UPDATE
+  */
   @Mutation(() => Boolean)
   async updateCard(
     @Arg("options", () => CardInputUpdate) options: CardInputUpdate
@@ -55,6 +63,9 @@ export class CardResolver {
     return false;
   }
 
+  /*
+  *  DELETE
+  */
   @Mutation(() => Boolean)
   async deleteCard(
     @Arg("cardId", () => Int) cardId: number
@@ -71,8 +82,33 @@ export class CardResolver {
     return false;
   }
 
+  /*
+  *  READ
+  */
   @Query(() => [Card])
   cards() {
     return Card.find();
+  }
+
+  @Query(() => Number)
+  async cardsAvailable(
+    @Arg("date", () => String) date: string
+  ) {
+    const cards = await Card.find();
+    const dateCheckins = await CheckIn.find({
+      startDate: date
+    });
+
+    let counter = cards.length;
+
+    dateCheckins.forEach((checkin) => {
+      cards.forEach(card => {
+        if (checkin.cardId === card.cardId) {
+          counter--;
+        }
+      })
+    });
+
+    return counter;
   }
 }
