@@ -1,5 +1,6 @@
-import {Arg, Int, Mutation, Query, Resolver} from "type-graphql";
-import {CheckIn} from '../entity/CheckIn';
+import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
+import { CheckIn } from '../entity/CheckIn';
+import { format } from "date-fns";
 
 @Resolver()
 export class CheckInResolver {
@@ -81,6 +82,17 @@ export class CheckInResolver {
     return await CheckIn.find({
       relations: ["card"]
     });
+  }
+  
+  @Query(() => [CheckIn])
+  async todayCheckIns() {
+    const allCheckIns = await CheckIn.find({
+      relations: ["card"]
+    });
+    
+    return allCheckIns.filter(checkIn =>
+      checkIn.startDate.includes(format(new Date(), "yyyy-MM-dd"))
+    );
   }
 
   @Query(() => [CheckIn])
