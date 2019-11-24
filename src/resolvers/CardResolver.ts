@@ -80,7 +80,9 @@ export class CardResolver {
     const cards = await Card.find({
       isDisabled: false
     });
-    const checkIns = await CheckIn.find();
+    const checkIns = await CheckIn.find({
+      relations: ["card"]
+    });
     const dateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date));
     let counter = cards.length;
     
