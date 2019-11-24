@@ -3,6 +3,7 @@ import { createConnection, getConnectionOptions } from "typeorm";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
+import graphqlHTTP from "express-graphql";
 import cors from "cors";
 import { CardResolver } from "./resolvers/CardResolver";
 import { CheckInResolver } from "./resolvers/CheckInResolver";
@@ -14,26 +15,36 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 	app.use(
 		cors({
 			origin: "http://localhost:3000",
-			credentials: true,
-		}),
+			credentials: true
+		})
 	);
 
 	const options = await getConnectionOptions(process.env.NODE_ENV || "development");
 	await createConnection({ ...options, name: "default" });
 
+	const graphqlSchema = await buildSchema({
+		resolvers: [CardResolver, CheckInResolver],
+		validate: true
+	});
+
 	const apolloServer = new ApolloServer({
-		schema: await buildSchema({
-			resolvers: [CardResolver, CheckInResolver],
-			validate: true,
-		}),
-		context: ({ req, res }) => ({ req, res }),
+		schema: graphqlSchema,
+		context: ({ req, res }) => ({ req, res })
 	});
 
 	apolloServer.applyMiddleware({ app, cors: false });
 	const port = process.env.PORT || 4000;
 
+	app.use(
+		"/api",
+		graphqlHTTP({
+			schema: graphqlSchema,
+			graphiql: true
+		})
+	);
+
 	app.listen(port, () => {
-		console.log(`server started at http://localhost:${port}/graphql`);
+		console.log(`Server started at http://localhost:${port}/graphql`);
 	});
 
 	ScheduleTodayNight(); // Schedule that checks if user has check ins open and alerts about checking out

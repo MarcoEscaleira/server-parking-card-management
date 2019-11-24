@@ -30,7 +30,9 @@ And then you can start the app
 yarn start:dev
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Now you can acess `http://localhost:4000/graphql` and play with the graphql playground
+
+App is being served on `http://localhost:4000/api` to make *HTTP* requests
 
 ## Running the tests
 
