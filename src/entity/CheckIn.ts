@@ -1,20 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
-import { Field, Int, ObjectType } from "type-graphql";
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn} from "typeorm";
+import { Field, ObjectType } from "type-graphql";
+import {Card} from "./Card";
 
 @ObjectType()
 @Entity()
 export class CheckIn extends BaseEntity {
-  @Field(() => Int)
+  @Field()
   @PrimaryGeneratedColumn()
-  checkInId: number;
-
-  @Field(() => Int)
-  @Column()
-  cardId: number;
+  id: number;
+  
+  @Field()
+  @OneToOne(() => Card)
+  @JoinColumn()
+  card: Card;
 
   @Field()
   @Column()
-  userEmail: string;
+  email: string;
 
   @Field()
   @Column()

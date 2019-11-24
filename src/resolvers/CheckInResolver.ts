@@ -1,5 +1,5 @@
-import { Resolver, Mutation, Arg, Query, Int } from "type-graphql";
-import { CheckIn } from '../entity/CheckIn';
+import {Arg, Int, Mutation, Query, Resolver} from "type-graphql";
+import {CheckIn} from '../entity/CheckIn';
 
 @Resolver()
 export class CheckInResolver {
@@ -10,15 +10,17 @@ export class CheckInResolver {
   @Mutation(() => Boolean)
   async createCheckIn(
     @Arg("cardId", () => Int) cardId: number,
-    @Arg("userEmail", () => String) userEmail: string,
+    @Arg("email", () => String) email: string,
     @Arg("startDate", () => String) startDate: string,
     @Arg("endDate", () => String) endDate: string,
     @Arg("isReserved", () => Boolean) isReserved: boolean = false
   ) {
     try {
       await CheckIn.insert({
-        cardId,
-        userEmail,
+        card: {
+          id: cardId
+        },
+        email,
         startDate,
         endDate,
         isReserved
@@ -36,11 +38,11 @@ export class CheckInResolver {
   */
  @Mutation(() => Boolean)
  async updateCheckIn(
-   @Arg("checkInId", () => Int) checkInId: number,
+   @Arg("id", () => Int) id: number,
    @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean
  ) {
    try {
-     await CheckIn.update({ checkInId },{
+     await CheckIn.update({ id },{
       hasCheckedOut
      });
 
@@ -56,11 +58,11 @@ export class CheckInResolver {
   */
   @Mutation(() => Boolean)
   async deleteCheckIn(
-    @Arg("checkInId", () => Int) checkInId: number
+    @Arg("id", () => Int) id: number
   ) {
     try {
       await CheckIn.delete({
-        checkInId
+        id
       });
 
       return true;
@@ -75,16 +77,21 @@ export class CheckInResolver {
   *  READ
   */
   @Query(() => [CheckIn])
-  checkIns() {
-    return CheckIn.find();
+  async checkIns() {
+    return await CheckIn.find({
+      relations: ["card"]
+    });
   }
 
   @Query(() => [CheckIn])
-  userCheckIns(
-    @Arg("email", () => String) userEmail: string
+  async userCheckIns(
+    @Arg("email", () => String) email: string
   ) {
-    return CheckIn.find({
-      userEmail
+    return await CheckIn.find({
+      relations: ["card"],
+      where: {
+        email
+      }
     });
   }
 }

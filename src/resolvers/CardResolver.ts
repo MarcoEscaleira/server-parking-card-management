@@ -1,22 +1,6 @@
-import { Resolver, Mutation, Arg, Int, Query, InputType, Field } from "type-graphql";
+import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
 import { CheckIn } from "../entity/CheckIn";
-
-@InputType()
-class CardInputUpdate {
-  @Field(() => Int)
-  cardId: number
-  @Field(() => Boolean)
-  isDisabled: boolean
-
-  // @Field(() => Int, { nullable: true})
-  // cardId: number | null
-
-  // It can be undefined in this case
-  // @Field(() => Int, { nullable: true})
-  // cardId?: number
-}
-
 
 @Resolver()
 export class CardResolver {
@@ -26,14 +10,14 @@ export class CardResolver {
   */
   @Mutation(() => Number)
   async createCard(
-    @Arg("cardNumber", () => Number) cardNumber: number
+    @Arg("cardNumber", () => Number) number: number
   ) {
     try {
       await Card.insert({
-        cardNumber
+        number
       });
 
-      return cardNumber;
+      return number;
     } catch (error) {
       console.error("CREATE CARD: ", error);
     }
@@ -45,12 +29,12 @@ export class CardResolver {
   */
   @Mutation(() => Boolean)
   async updateCard(
-    @Arg("options", () => CardInputUpdate) options: CardInputUpdate
+    @Arg("id", () => Int) id: number,
+    @Arg("isDisabled", () => Boolean) isDisabled: boolean
   ) {
     try {
-      const { cardId, isDisabled } = options;
       await Card.update({
-        cardId
+        id
       }, {
         isDisabled
       });
@@ -67,11 +51,11 @@ export class CardResolver {
   */
   @Mutation(() => Boolean)
   async deleteCard(
-    @Arg("cardId", () => Int) cardId: number
+    @Arg("id", () => Int) id: number
   ) {
     try {
       await Card.delete({
-        cardId
+        id
       });
 
       return true;
@@ -102,7 +86,7 @@ export class CardResolver {
     
     dateCheckIns.forEach((checkin) => {
       cards.forEach(card => {
-        if (checkin.cardId === card.cardId) {
+        if (checkin.card.id === card.id) {
           counter--;
         }
       })
@@ -125,11 +109,11 @@ export class CardResolver {
     allDateCheckIns.forEach(checkIn => {
       const checkInFinishHour = checkIn.endDate.split('T')[1].split('Z')[0];
       if (checkInFinishHour > mainCheckInHour) {
-          if (notAvailableCardsId.indexOf(checkIn.cardId) === -1) {
-            notAvailableCardsId.push(checkIn.cardId);
+          if (notAvailableCardsId.indexOf(checkIn.card.id) === -1) {
+            notAvailableCardsId.push(checkIn.card.id);
           }
       }
     });
-    return allCards.filter((card => notAvailableCardsId.indexOf(card.cardId) === -1));
+    return allCards.filter((card => notAvailableCardsId.indexOf(card.id) === -1));
   }
 }

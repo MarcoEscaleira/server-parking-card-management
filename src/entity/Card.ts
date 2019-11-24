@@ -6,11 +6,11 @@ import { Field, Int, ObjectType } from "type-graphql";
 export class Card extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  cardId: number;
+  id: number;
 
   @Field(() => Int)
   @Column()
-  cardNumber: number;
+  number: number;
 
   @Field()
   @Column('boolean', { default: false })

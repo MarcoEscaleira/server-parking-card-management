@@ -1,6 +1,5 @@
 import schedule from 'node-schedule';
 import {format, subDays} from 'date-fns';
-// import { sendEmail } from './sendEmail';
 import { CheckIn } from "../entity/CheckIn";
 import {sendEmail} from "./sendEmail";
 
@@ -19,11 +18,11 @@ export const ScheduleTodayNight = () => {
     const showDate = format(new Date(),"dd-MM-yyyy");
     const checkIns = await dateCheckIns(format(new Date(),"yyyy-MM-dd"));
   
-    checkIns.forEach(({ userEmail, hasCheckedOut }) => {
+    checkIns.forEach(({ email, hasCheckedOut }) => {
       if (!hasCheckedOut) {
         // Checkin still open so sending email to user
         sendEmail(
-          userEmail,
+          email,
           `You have a check in for ${showDate}!!!`,
           "Do not forget to do your checkout. Good night :)"
         );
@@ -42,18 +41,18 @@ export const ScheduleTodayMorning = () => {
     const showDate = format(subDays(new Date, 1), "dd-MM-yyyy");
     const checkIns = await dateCheckIns(format(subDays(new Date, 1), "yyyy-MM-dd"));
   
-    checkIns.forEach(({ checkInId, userEmail, hasCheckedOut }) => {
+    checkIns.forEach(({ id, email, hasCheckedOut }) => {
       if (!hasCheckedOut) {
         // Do checkout
         CheckIn.update({
-          checkInId
+          id
         }, {
           hasExpired: true,
           hasCheckedOut: true
         });
         // Checkin still open so sending email to user to warn we are checking out
         sendEmail(
-          userEmail,
+          email,
           `Your check in for ${showDate} has been expired (checked out automatically)!!!`,
           "We have checked out for you. Hoping you left the card in the spot :)"
         );
