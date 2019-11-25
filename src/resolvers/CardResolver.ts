@@ -1,6 +1,8 @@
 import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
-import { CheckIn } from "../entity/CheckIn";
+import { CheckInResolver } from "./CheckInResolver";
+
+const checkInResolver = new CheckInResolver();
 
 @Resolver()
 export class CardResolver {
@@ -68,15 +70,17 @@ export class CardResolver {
 		return Card.find();
 	}
 
-	@Query(() => Number)
-	async cardsAvailableNumber(@Arg("date", () => String) date: string) {
-		const cards = await Card.find({
+	@Query(() => [Card])
+	async cardsEnabled() {
+		return await Card.find({
 			isDisabled: false
 		});
-		const checkIns = await CheckIn.find({
-			relations: ["card"]
-		});
-		const dateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date));
+	}
+
+	@Query(() => Number)
+	async cardsAvailableNumberToday() {
+		const cards = await this.cardsEnabled();
+		const dateCheckIns = await checkInResolver.todayCheckIns();
 		let counter = cards.length;
 
 		dateCheckIns.forEach(checkin => {
@@ -91,10 +95,8 @@ export class CardResolver {
 
 	@Query(() => [Card])
 	async cardsAvailableList(@Arg("date", () => String) date: string) {
-		const allCards = await Card.find({
-			isDisabled: false
-		});
-		const checkIns = await CheckIn.find();
+		const allCards = await this.cardsEnabled();
+		const checkIns = await checkInResolver.checkIns();
 		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date.split("T")[0]));
 		const mainCheckInHour = date.split("T")[1].split("Z")[0];
 		const notAvailableCardsId: number[] = [];
