@@ -13,17 +13,17 @@ export class CheckInResolver {
 		@Arg("email", () => String) email: string,
 		@Arg("startDate", () => String) startDate: string,
 		@Arg("endDate", () => String) endDate: string,
-		@Arg("isReserved", () => Boolean) isReserved = false,
+		@Arg("isReserved", () => Boolean) isReserved = false
 	) {
 		try {
 			await CheckIn.insert({
 				card: {
-					id: cardId,
+					id: cardId
 				},
 				email,
 				startDate,
 				endDate,
-				isReserved,
+				isReserved
 			});
 
 			return true;
@@ -42,8 +42,8 @@ export class CheckInResolver {
 			await CheckIn.update(
 				{ id },
 				{
-					hasCheckedOut,
-				},
+					hasCheckedOut
+				}
 			);
 
 			return true;
@@ -60,7 +60,7 @@ export class CheckInResolver {
 	async deleteCheckIn(@Arg("id", () => Int) id: number) {
 		try {
 			await CheckIn.delete({
-				id,
+				id
 			});
 
 			return true;
@@ -76,14 +76,14 @@ export class CheckInResolver {
 	@Query(() => [CheckIn])
 	async checkIns() {
 		return await CheckIn.find({
-			relations: ["card"],
+			relations: ["card"]
 		});
 	}
 
 	@Query(() => [CheckIn])
 	async todayCheckIns() {
 		const allCheckIns = await CheckIn.find({
-			relations: ["card"],
+			relations: ["card"]
 		});
 
 		return allCheckIns.filter(checkIn => checkIn.startDate.includes(format(new Date(), "yyyy-MM-dd")));
@@ -94,8 +94,8 @@ export class CheckInResolver {
 		return await CheckIn.find({
 			relations: ["card"],
 			where: {
-				email,
-			},
+				email
+			}
 		});
 	}
 }

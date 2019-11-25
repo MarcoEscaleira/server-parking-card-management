@@ -11,7 +11,7 @@ export class CardResolver {
 	async createCard(@Arg("cardNumber", () => Number) number: number) {
 		try {
 			await Card.insert({
-				number,
+				number
 			});
 
 			return number;
@@ -29,11 +29,11 @@ export class CardResolver {
 		try {
 			await Card.update(
 				{
-					id,
+					id
 				},
 				{
-					isDisabled,
-				},
+					isDisabled
+				}
 			);
 
 			return true;
@@ -50,7 +50,7 @@ export class CardResolver {
 	async deleteCard(@Arg("id", () => Int) id: number) {
 		try {
 			await Card.delete({
-				id,
+				id
 			});
 
 			return true;
@@ -71,10 +71,10 @@ export class CardResolver {
 	@Query(() => Number)
 	async cardsAvailableNumber(@Arg("date", () => String) date: string) {
 		const cards = await Card.find({
-			isDisabled: false,
+			isDisabled: false
 		});
 		const checkIns = await CheckIn.find({
-			relations: ["card"],
+			relations: ["card"]
 		});
 		const dateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date));
 		let counter = cards.length;
@@ -92,7 +92,7 @@ export class CardResolver {
 	@Query(() => [Card])
 	async cardsAvailableList(@Arg("date", () => String) date: string) {
 		const allCards = await Card.find({
-			isDisabled: false,
+			isDisabled: false
 		});
 		const checkIns = await CheckIn.find();
 		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date.split("T")[0]));

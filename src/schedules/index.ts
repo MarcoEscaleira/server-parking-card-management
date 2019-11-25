@@ -42,18 +42,18 @@ export const ScheduleTodayMorning = () => {
 				// Do checkout
 				CheckIn.update(
 					{
-						id,
+						id
 					},
 					{
 						hasExpired: true,
-						hasCheckedOut: true,
-					},
+						hasCheckedOut: true
+					}
 				);
 				// Checkin still open so sending email to user to warn we are checking out
 				sendEmail(
 					email,
 					`Your check in for ${showDate} has been expired (checked out automatically)!!!`,
-					"We have checked out for you. Hoping you left the card in the spot :)",
+					"We have checked out for you. Hoping you left the card in the spot :)"
 				);
 			}
 		});

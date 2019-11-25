@@ -12,10 +12,18 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 (async () => {
 	const app = express();
 
+	const port = process.env.PORT || 4000;
+
+	const corsWhitelist = ["http://localhost:3000", `http://localhost:${port}`];
 	app.use(
 		cors({
-			origin: "http://localhost:3000",
-			credentials: true
+			origin: (origin, callback) => {
+				if (corsWhitelist.indexOf(origin as string) !== -1 || !origin) {
+					callback(null, true);
+				} else {
+					callback(new Error("Not allowed by CORS"));
+				}
+			}
 		})
 	);
 
@@ -33,7 +41,6 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 	});
 
 	apolloServer.applyMiddleware({ app, cors: false });
-	const port = process.env.PORT || 4000;
 
 	app.use(
 		"/api",
