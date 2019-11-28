@@ -17,9 +17,7 @@ export class CheckInResolver {
 	) {
 		try {
 			await CheckIn.insert({
-				card: {
-					id: cardId
-				},
+				cardId,
 				email,
 				startDate,
 				endDate,

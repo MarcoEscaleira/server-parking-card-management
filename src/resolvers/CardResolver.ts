@@ -12,11 +12,21 @@ export class CardResolver {
 	@Mutation(() => Number)
 	async createCard(@Arg("cardNumber", () => Number) number: number) {
 		try {
-			await Card.insert({
-				number
+			const allCards = await this.cards();
+			let hasAlreadyCardNumber = false;
+
+			allCards.forEach(card => {
+				if (card.number === number) {
+					hasAlreadyCardNumber = true;
+				}
 			});
 
-			return number;
+			if (!hasAlreadyCardNumber) {
+				await Card.insert({
+					number
+				});
+				return number;
+			}
 		} catch (error) {
 			console.error("CREATE CARD: ", error);
 		}
@@ -67,13 +77,18 @@ export class CardResolver {
 	 */
 	@Query(() => [Card])
 	cards() {
-		return Card.find();
+		return Card.find({
+			relations: ["checkIns"]
+		});
 	}
 
 	@Query(() => [Card])
 	async cardsEnabled() {
 		return await Card.find({
-			isDisabled: false
+			where: {
+				isDisabled: false
+			},
+			relations: ["checkIns"]
 		});
 	}
 
@@ -93,19 +108,21 @@ export class CardResolver {
 		return counter;
 	}
 
+	getISOHour = (isoDate: string): string => isoDate.split("T")[1].split("Z")[0];
+
 	@Query(() => [Card])
 	async cardsAvailableList(@Arg("date", () => String) date: string) {
 		const allCards = await this.cardsEnabled();
 		const checkIns = await checkInResolver.checkIns();
 		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date.split("T")[0]));
-		const mainCheckInHour = date.split("T")[1].split("Z")[0];
+		const mainCheckInHour = this.getISOHour(date);
 		const notAvailableCardsId: number[] = [];
 
-		allDateCheckIns.forEach(checkIn => {
-			const checkInFinishHour = checkIn.endDate.split("T")[1].split("Z")[0];
+		allDateCheckIns.forEach(({ endDate, card: { id } }) => {
+			const checkInFinishHour = this.getISOHour(endDate);
 			if (checkInFinishHour > mainCheckInHour) {
-				if (notAvailableCardsId.indexOf(checkIn.card.id) === -1) {
-					notAvailableCardsId.push(checkIn.card.id);
+				if (notAvailableCardsId.indexOf(id) === -1) {
+					notAvailableCardsId.push(id);
 				}
 			}
 		});

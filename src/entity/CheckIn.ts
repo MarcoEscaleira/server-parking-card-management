@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { Card } from "./Card";
 
@@ -9,9 +9,14 @@ export class CheckIn extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Field()
-	@OneToOne(() => Card)
-	@JoinColumn()
+	@Column()
+	cardId: number;
+	@Field(() => Card)
+	@ManyToOne(
+		() => Card,
+		card => card.checkIns
+	)
+	@JoinColumn({ name: "cardId" })
 	card: Card;
 
 	@Field()
