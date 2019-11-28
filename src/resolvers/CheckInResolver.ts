@@ -1,6 +1,10 @@
 import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { CheckIn } from "../entity/CheckIn";
-import { format } from "date-fns";
+import { yearFirstDate } from "../utils/datesFormat";
+
+const checkInOptions = {
+	relations: ["card"]
+};
 
 @Resolver()
 export class CheckInResolver {
@@ -23,7 +27,6 @@ export class CheckInResolver {
 				endDate,
 				isReserved
 			});
-
 			return true;
 		} catch (error) {
 			console.error("CREATE CHECKIN:", error);
@@ -60,7 +63,6 @@ export class CheckInResolver {
 			await CheckIn.delete({
 				id
 			});
-
 			return true;
 		} catch (error) {
 			console.error("DELETE CHECK IN: ", error);
@@ -73,24 +75,20 @@ export class CheckInResolver {
 	 */
 	@Query(() => [CheckIn])
 	async checkIns() {
-		return await CheckIn.find({
-			relations: ["card"]
-		});
+		return await CheckIn.find(checkInOptions);
 	}
 
 	@Query(() => [CheckIn])
 	async todayCheckIns() {
-		const allCheckIns = await CheckIn.find({
-			relations: ["card"]
-		});
+		const allCheckIns = await CheckIn.find(checkInOptions);
 
-		return allCheckIns.filter(checkIn => checkIn.startDate.includes(format(new Date(), "yyyy-MM-dd")));
+		return allCheckIns.filter(checkIn => checkIn.startDate.includes(yearFirstDate()));
 	}
 
 	@Query(() => [CheckIn])
 	async userCheckIns(@Arg("email", () => String) email: string) {
 		return await CheckIn.find({
-			relations: ["card"],
+			...checkInOptions,
 			where: {
 				email
 			}

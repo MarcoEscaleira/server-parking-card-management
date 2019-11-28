@@ -1,8 +1,13 @@
 import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
 import { CheckInResolver } from "./CheckInResolver";
+import { getIsoStringDate, getISOHour } from "src/utils/datesFormat";
 
 const checkInResolver = new CheckInResolver();
+
+const cardOptions = {
+	relations: ["checkIns"]
+};
 
 @Resolver()
 export class CardResolver {
@@ -47,7 +52,6 @@ export class CardResolver {
 					isDisabled
 				}
 			);
-
 			return true;
 		} catch (error) {
 			console.error("UPDATE CARD: ", error);
@@ -64,7 +68,6 @@ export class CardResolver {
 			await Card.delete({
 				id
 			});
-
 			return true;
 		} catch (error) {
 			console.error("DELETE CARD: ", error);
@@ -77,18 +80,16 @@ export class CardResolver {
 	 */
 	@Query(() => [Card])
 	cards() {
-		return Card.find({
-			relations: ["checkIns"]
-		});
+		return Card.find(cardOptions);
 	}
 
 	@Query(() => [Card])
 	async cardsEnabled() {
 		return await Card.find({
+			...cardOptions,
 			where: {
 				isDisabled: false
-			},
-			relations: ["checkIns"]
+			}
 		});
 	}
 
@@ -108,18 +109,16 @@ export class CardResolver {
 		return counter;
 	}
 
-	getISOHour = (isoDate: string): string => isoDate.split("T")[1].split("Z")[0];
-
 	@Query(() => [Card])
 	async cardsAvailableList(@Arg("date", () => String) date: string) {
 		const allCards = await this.cardsEnabled();
 		const checkIns = await checkInResolver.checkIns();
-		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(date.split("T")[0]));
-		const mainCheckInHour = this.getISOHour(date);
+		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(getIsoStringDate(date)));
+		const mainCheckInHour = getISOHour(date);
 		const notAvailableCardsId: number[] = [];
 
 		allDateCheckIns.forEach(({ endDate, card: { id } }) => {
-			const checkInFinishHour = this.getISOHour(endDate);
+			const checkInFinishHour = getISOHour(endDate);
 			if (checkInFinishHour > mainCheckInHour) {
 				if (notAvailableCardsId.indexOf(id) === -1) {
 					notAvailableCardsId.push(id);
