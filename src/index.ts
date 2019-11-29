@@ -52,6 +52,7 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 
 	app.listen(port, () => {
 		console.log(`Server started at http://localhost:${port}/graphql`);
+		console.log(`Server started at http://localhost:${port}/api -> For HTTP Requests`);
 	});
 
 	ScheduleTodayNight(); // Schedule that checks if user has check ins open and alerts about checking out
