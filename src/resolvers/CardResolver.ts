@@ -1,7 +1,7 @@
 import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
 import { CheckInResolver } from "./CheckInResolver";
-import { getIsoStringDate, getISOHour } from "src/utils/datesFormat";
+import { getIsoStringDate, getISOHour } from "../utils/datesFormat";
 
 const checkInResolver = new CheckInResolver();
 
