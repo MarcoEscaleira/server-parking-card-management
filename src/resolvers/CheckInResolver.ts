@@ -29,20 +29,13 @@ export class CheckInResolver {
 			// User has a checkIn for the entered date
 			if (userHasCheckInToday) return false;
 
-			console.log({
+			await CheckIn.insert({
 				cardId,
 				email,
 				startDate,
 				endDate,
 				isReserved
 			});
-			// await CheckIn.insert({
-			// 	cardId,
-			// 	email,
-			// 	startDate,
-			// 	endDate,
-			// 	isReserved
-			// });
 			return true;
 		} catch (error) {
 			console.error("CREATE CHECKIN:", error);
