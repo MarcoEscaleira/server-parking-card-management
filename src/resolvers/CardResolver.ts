@@ -111,6 +111,7 @@ export class CardResolver {
 
 	@Query(() => [Card])
 	async cardsAvailableList(@Arg("date", () => String) date: string) {
+		// date being received should be in ISO string format
 		const allCards = await this.cardsEnabled();
 		const checkIns = await checkInResolver.checkIns();
 		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(getIsoStringDate(date)));

@@ -1,6 +1,6 @@
 import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { CheckIn } from "../entity/CheckIn";
-import { yearFirstDate } from "../utils/datesFormat";
+import { getIsoStringDate, yearFirstDate } from "../utils/datesFormat";
 
 const checkInOptions = {
 	relations: ["card"]
@@ -20,13 +20,29 @@ export class CheckInResolver {
 		@Arg("isReserved", () => Boolean) isReserved = false
 	) {
 		try {
-			await CheckIn.insert({
+			const userCheckIns = await this.userCheckIns(email);
+			const newCheckInDate = getIsoStringDate(startDate);
+
+			// Verifying if user has a checkIn for this date
+			const userHasCheckInToday = userCheckIns.find(checkIn => getIsoStringDate(checkIn.startDate) === newCheckInDate);
+
+			// User has a checkIn for the entered date
+			if (userHasCheckInToday) return false;
+
+			console.log({
 				cardId,
 				email,
 				startDate,
 				endDate,
 				isReserved
 			});
+			// await CheckIn.insert({
+			// 	cardId,
+			// 	email,
+			// 	startDate,
+			// 	endDate,
+			// 	isReserved
+			// });
 			return true;
 		} catch (error) {
 			console.error("CREATE CHECKIN:", error);
