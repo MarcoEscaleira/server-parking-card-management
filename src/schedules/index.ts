@@ -5,7 +5,7 @@ import { sendEmail } from "./sendEmail";
 
 const dateCheckIns = async (date: string) => {
 	const checkIns = await CheckIn.find();
-	return checkIns.filter(checkIn => checkIn.startDate.includes(date));
+	return checkIns.filter(checkIn => checkIn.date.includes(date));
 };
 
 export const ScheduleTodayNight = () => {

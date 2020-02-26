@@ -1,7 +1,6 @@
 import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
 import { CheckInResolver } from "./CheckInResolver";
-import { getIsoStringDate, getISOHour } from "../utils/datesFormat";
 
 const checkInResolver = new CheckInResolver();
 
@@ -107,25 +106,5 @@ export class CardResolver {
 			});
 		});
 		return counter;
-	}
-
-	@Query(() => [Card])
-	async cardsAvailableList(@Arg("date", () => String) date: string) {
-		// date being received should be in ISO string format
-		const allCards = await this.cardsEnabled();
-		const checkIns = await checkInResolver.checkIns();
-		const allDateCheckIns = checkIns.filter(checkIn => checkIn.startDate.includes(getIsoStringDate(date)));
-		const mainCheckInHour = getISOHour(date);
-		const notAvailableCardsId: number[] = [];
-
-		allDateCheckIns.forEach(({ endDate, card: { id } }) => {
-			const checkInFinishHour = getISOHour(endDate);
-			if (checkInFinishHour > mainCheckInHour) {
-				if (notAvailableCardsId.indexOf(id) === -1) {
-					notAvailableCardsId.push(id);
-				}
-			}
-		});
-		return allCards.filter(card => notAvailableCardsId.indexOf(card.id) === -1);
 	}
 }

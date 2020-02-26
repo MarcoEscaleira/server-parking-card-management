@@ -25,11 +25,11 @@ export class CheckIn extends BaseEntity {
 
 	@Field()
 	@Column()
-	startDate: string;
+	date: string;
 
 	@Field()
 	@Column()
-	endDate: string;
+	occupation: string;
 
 	@Field()
 	@Column("boolean", { default: false })

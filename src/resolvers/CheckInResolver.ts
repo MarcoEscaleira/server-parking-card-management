@@ -1,6 +1,6 @@
 import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { CheckIn } from "../entity/CheckIn";
-import { getIsoStringDate, yearFirstDate } from "../utils/datesFormat";
+import { getDate } from "../utils/datesFormat";
 
 const checkInOptions = {
 	relations: ["card"]
@@ -15,16 +15,15 @@ export class CheckInResolver {
 	async createCheckIn(
 		@Arg("cardId", () => Int) cardId: number,
 		@Arg("email", () => String) email: string,
-		@Arg("startDate", () => String) startDate: string,
-		@Arg("endDate", () => String) endDate: string,
+		@Arg("date", () => String) date: string,
+		@Arg("occupation", () => String) occupation: string,
 		@Arg("isReserved", () => Boolean) isReserved = false
 	) {
 		try {
 			const userCheckIns = await this.userCheckIns(email);
-			const newCheckInDate = getIsoStringDate(startDate);
 
 			// Verifying if user has a checkIn for this date
-			const userHasCheckInToday = userCheckIns.find(checkIn => getIsoStringDate(checkIn.startDate) === newCheckInDate);
+			const userHasCheckInToday = userCheckIns.find(checkIn => checkIn.date === date);
 
 			// User has a checkIn for the entered date
 			if (userHasCheckInToday) return false;
@@ -32,8 +31,8 @@ export class CheckInResolver {
 			await CheckIn.insert({
 				cardId,
 				email,
-				startDate,
-				endDate,
+				date,
+				occupation,
 				isReserved
 			});
 			return true;
@@ -49,12 +48,7 @@ export class CheckInResolver {
 	@Mutation(() => Boolean)
 	async updateCheckIn(@Arg("id", () => Int) id: number, @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean) {
 		try {
-			await CheckIn.update(
-				{ id },
-				{
-					hasCheckedOut
-				}
-			);
+			await CheckIn.update({ id }, { hasCheckedOut });
 
 			return true;
 		} catch (error) {
@@ -91,7 +85,7 @@ export class CheckInResolver {
 	async todayCheckIns() {
 		const allCheckIns = await CheckIn.find(checkInOptions);
 
-		return allCheckIns.filter(checkIn => checkIn.startDate.includes(yearFirstDate()));
+		return allCheckIns.filter(checkIn => checkIn.date === getDate());
 	}
 
 	@Query(() => [CheckIn])

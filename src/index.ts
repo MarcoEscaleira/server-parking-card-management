@@ -7,7 +7,6 @@ import graphqlHTTP from "express-graphql";
 import cors from "cors";
 import { CardResolver } from "./resolvers/CardResolver";
 import { CheckInResolver } from "./resolvers/CheckInResolver";
-import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 
 (async () => {
 	const app = express();
@@ -55,6 +54,7 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 		console.log(`Server started at http://localhost:${port}/api -> For HTTP Requests`);
 	});
 
-	ScheduleTodayNight(); // Schedule that checks if user has check ins open and alerts about checking out
-	ScheduleTodayMorning(); // Schedule that checks if user has check ins open and complete user checkout
+	// TODO: rework schedules to work with new date system
+	// ScheduleTodayNight(); // Schedule that checks if user has check ins open and alerts about checking out
+	// ScheduleTodayMorning(); // Schedule that checks if user has check ins open and complete user checkout
 })();
