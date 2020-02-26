@@ -54,6 +54,7 @@ Further more in time I want to deploy this app and have a pipeline for it so we 
 ## Authors
 
 * **Marco Escaleira** - marco.escaleira@mindera.com
+* **Anderson Fernandes** - anderson.fernandes@mindera.com
 
 
 ## Acknowledgments
