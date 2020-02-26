@@ -14,7 +14,7 @@ import { ScheduleTodayNight, ScheduleTodayMorning } from "./schedules";
 
 	const port = process.env.PORT || 4000;
 
-	const corsWhitelist = ["http://localhost:3000", `http://localhost:${port}`];
+	const corsWhitelist = ["http://localhost:3000", "http://localhost:8081", `http://localhost:${port}`];
 	app.use(
 		cors({
 			origin: (origin, callback) => {
