@@ -1,8 +1,5 @@
 import { Resolver, Mutation, Arg, Int, Query } from "type-graphql";
 import { Card } from "../entity/Card";
-import { CheckInResolver } from "./CheckInResolver";
-
-const checkInResolver = new CheckInResolver();
 
 const cardOptions = {
 	relations: ["checkIns"]
@@ -90,21 +87,5 @@ export class CardResolver {
 				isDisabled: false
 			}
 		});
-	}
-
-	@Query(() => Number)
-	async cardsAvailableNumberToday() {
-		const cards = await this.cardsEnabled();
-		const dateCheckIns = await checkInResolver.todayCheckIns();
-		let counter = cards.length;
-
-		dateCheckIns.forEach(checkin => {
-			cards.forEach(card => {
-				if (checkin.card.id === card.id) {
-					counter--;
-				}
-			});
-		});
-		return counter;
 	}
 }

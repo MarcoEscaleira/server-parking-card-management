@@ -97,4 +97,14 @@ export class CheckInResolver {
 			}
 		});
 	}
+
+	@Query(() => [CheckIn])
+	async dateCheckIns(@Arg("date", () => String) date: string) {
+		return await CheckIn.find({
+			...checkInOptions,
+			where: {
+				date
+			}
+		});
+	}
 }
