@@ -45,7 +45,6 @@ export const ScheduleTodayMorning = () => {
 						id
 					},
 					{
-						hasExpired: true,
 						hasCheckedOut: true
 					}
 				);

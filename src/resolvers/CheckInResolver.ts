@@ -16,8 +16,7 @@ export class CheckInResolver {
 		@Arg("cardId", () => Int) cardId: number,
 		@Arg("email", () => String) email: string,
 		@Arg("date", () => String) date: string,
-		@Arg("occupation", () => String) occupation: string,
-		@Arg("isReserved", () => Boolean) isReserved = false
+		@Arg("occupation", () => String) occupation: string
 	) {
 		try {
 			const userCheckIns = await this.userCheckIns(email);
@@ -32,8 +31,7 @@ export class CheckInResolver {
 				cardId,
 				email,
 				date,
-				occupation,
-				isReserved
+				occupation
 			});
 			return true;
 		} catch (error) {
@@ -46,9 +44,13 @@ export class CheckInResolver {
 	 *  UPDATE
 	 */
 	@Mutation(() => Boolean)
-	async updateCheckIn(@Arg("id", () => Int) id: number, @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean) {
+	async updateCheckIn(
+		@Arg("id", () => Int) id: number,
+		@Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean,
+		@Arg("isCanceled", () => Boolean) isCanceled: boolean
+	) {
 		try {
-			await CheckIn.update({ id }, { hasCheckedOut });
+			await CheckIn.update({ id }, { hasCheckedOut, isCanceled });
 
 			return true;
 		} catch (error) {

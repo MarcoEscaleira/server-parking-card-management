@@ -37,9 +37,5 @@ export class CheckIn extends BaseEntity {
 
 	@Field()
 	@Column("boolean", { default: false })
-	hasExpired: boolean;
-
-	@Field()
-	@Column("boolean", { default: false })
-	isReserved: boolean;
+	isCanceled: boolean;
 }
