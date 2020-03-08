@@ -44,17 +44,25 @@ export class CheckInResolver {
 	 *  UPDATE
 	 */
 	@Mutation(() => Boolean)
-	async updateCheckIn(
-		@Arg("id", () => Int) id: number,
-		@Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean,
-		@Arg("isCanceled", () => Boolean) isCanceled: boolean
-	) {
+	async checkOutCheckIn(@Arg("id", () => Int) id: number, @Arg("hasCheckedOut", () => Boolean) hasCheckedOut: boolean) {
 		try {
-			await CheckIn.update({ id }, { hasCheckedOut, isCanceled });
+			await CheckIn.update({ id }, { hasCheckedOut });
 
 			return true;
 		} catch (error) {
-			console.error("UPDATE CHECKIN:", error);
+			console.error("CHECKING OUT:", error);
+		}
+		return false;
+	}
+
+	@Mutation(() => Boolean)
+	async cancelCheckIn(@Arg("id", () => Int) id: number, @Arg("isCanceled", () => Boolean) isCanceled: boolean) {
+		try {
+			await CheckIn.update({ id }, { isCanceled });
+
+			return true;
+		} catch (error) {
+			console.error("CANCELING CHECKIN:", error);
 		}
 		return false;
 	}
