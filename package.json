@@ -21,7 +21,7 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "apollo-server-express": "^2.9.9",
+    "apollo-server-express": "^2.14.2",
     "cors": "^2.8.5",
     "date-fns": "^2.8.1",
     "dotenv": "^8.2.0",
